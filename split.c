@@ -9,19 +9,18 @@ struct token_node {
     char *token;
 };
 
-bool split(struct list_head *head, char *str, char *separator);
+bool split(struct list_head *head, char *str, char *sep);
 
 int main(void) {
     struct list_head head;
     struct token_node *cursor;
-    char *str = "hogehoge,mogemoge,foofoo,barbar";
+    char str[] = "hogehoge,mogemoge,foofoo,barbar, ";
 
     INIT_LIST_HEAD(&head);
 
     if(split(&head, str, ",")) {
-        printf("split() done\n");
         list_for_each_entry(cursor, &(head), list) {
-            puts(cursor->token);
+            printf("%s\n", cursor->token);
         }
     }
     return 0;
@@ -33,13 +32,22 @@ bool split(struct list_head *head, char *str, char *sep)
     struct token_node *new;
 
     tp = strtok(str, sep);
-    printf("%p\n", tp);
-    while(tp != NULL) {
-        printf("loop\n");
+
+    if(tp != NULL) {
         new = malloc(sizeof(struct token_node));
         if(!new) return false;
         new->token = tp;
         list_add_tail(&(new->list), head);
+    }
+
+    while(tp != NULL) {
+        tp = strtok(NULL, sep);
+        if(tp != NULL) {
+            new = malloc(sizeof(struct token_node));
+            if(!new) return false;
+            new->token = tp;
+            list_add_tail(&(new->list), head);
+        }
     }
     return true;
 }
